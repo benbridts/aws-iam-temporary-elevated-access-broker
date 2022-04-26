@@ -32,27 +32,8 @@ def deep_get(d, keys, default=None):
         return d
     return deep_get(d.get(keys[0]), keys[1:], default)
 
-def cors_headers():
-    return {
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,HEAD,PUT,DELETE,PATCH'
-    }
-
 
 # ********** Query METHODS ************#
-
-def lambda_handler(event, context):
-    logging.debug("HTTP OPTIONS: Returning CORS Headers")
-    return {
-        'headers': {
-            "Access-Control-Allow-Origin": '*',
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,HEAD,PUT,DELETE,PATCH'
-        },
-        'statusCode': 200,
-        'body': json.dumps('Returning CORS Headers')
-    }
 
 def get_requests(event, context):
     loader = DatabaseLoader()
@@ -160,7 +141,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response
@@ -203,7 +183,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response
@@ -250,7 +229,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response
@@ -296,7 +274,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response
@@ -346,7 +323,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response
@@ -412,7 +388,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response
@@ -475,7 +450,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response
@@ -523,7 +497,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response
@@ -608,7 +581,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response
@@ -675,7 +647,6 @@ class DatabaseLoader:
             result = str(error)
         response = {
             "statusCode": status_code,
-            'headers': cors_headers(),
             "body": json.dumps(result, indent=2, sort_keys=True, default=str)
         }
         return response

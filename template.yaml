@@ -232,10 +232,11 @@ Resources:
               - Access-Control-Request-Method
               - Origin
               - Authorization
+              - x-api-key
           CookiesConfig:
             CookieBehavior: none
           QueryStringsConfig:
-            QueryStringBehavior: none
+            QueryStringBehavior: all
   Distribution:
     Type: 'AWS::CloudFront::Distribution'
     DependsOn: OriginAccessIdentity
@@ -257,10 +258,33 @@ Resources:
           Compress: false
           ViewerProtocolPolicy: redirect-to-https
           TargetOriginId: Bucket
+          ResponseHeadersPolicyId: !Ref CloudFrontResourceHeadersPolicy
           LambdaFunctionAssociations:
             - EventType: origin-response
               LambdaFunctionARN: !Ref OriginResponseLambdaFunctionVersion
+        CacheBehaviors:
+        - TargetOriginId: APIGW
+          CachePolicyId: !Ref CloudFrontCachePolicy
+          ViewerProtocolPolicy: redirect-to-https
+          ResponseHeadersPolicyId: !Ref CloudFrontResourceHeadersPolicy
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          Compress: false
+          PathPattern: !Sub '/${Stage}/*'
         Origins:
+          - Id: APIGW
+            DomainName: !Sub ${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: 
+                - TLSv1.2
           - Id: Bucket
             DomainName: !GetAtt 
               - WebBucket
@@ -271,6 +295,34 @@ Resources:
                 - - origin-access-identity
                   - cloudfront
                   - !Ref OriginAccessIdentity
+  CloudFrontResourceHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties: 
+      ResponseHeadersPolicyConfig: 
+        Name: !Sub '${AWS::StackName}-response-headers-policy'
+        CorsConfig: 
+          AccessControlAllowCredentials: false
+          AccessControlAllowMethods: 
+            Items: 
+              - 'OPTIONS'
+              - 'POST'
+              - 'GET'
+              - 'HEAD'
+              - 'PUT'
+              - 'DELETE'
+              - 'PATCH'
+          AccessControlAllowHeaders: 
+            Items: 
+             - 'Content-Type'
+             - 'X-Amz-Date'
+             - 'Authorization'
+             - 'X-Api-Key'
+             - 'X-Amz-Security-Token'
+          AccessControlAllowOrigins: 
+            Items: 
+              - '*'
+          AccessControlMaxAgeSec: 600
+          OriginOverride: true
   LambdaEdgeFunctionRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -2183,15 +2235,17 @@ Outputs:
         - !Ref 'AWS::URLSuffix'
         - /
         - !Ref Stage
+  APIStage:
+    Description: The name of the stage, which API Gateway uses as the first path segment in the invoked Uniform Resource Identifier (URI)
+    Value: !Ref Stage
   LambdaIdentityBrokerRole:
     Description: Role ARN to configure the trust policies of the target roles
     Value: !GetAtt 
       - LambdaIdentityBrokerRole
       - Arn
-  RedirectURI:
+  CloudFrontURL:
     Description: >-
-      CloudFront distribution that will be used by OAuth providers as a location
-      to deliver the access_token by means of a browser redirect
+      CloudFront distribution link to the console
     Value: !Join 
       - ''
       - - 'https://'

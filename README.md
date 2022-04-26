@@ -254,7 +254,7 @@ After you successfully deploy the solution using the steps in the previous secti
 * Navigate to the `/ui-frontend` folder of the cloned repo and make the following updates:
     * **src/App.tsx**
       
-        Under the OktaAuth object, replace each of these property values with ones from your Okta org and application. For more information about these properties, see the [Client Configuration section of the Auth SDK reference](https://github.com/okta/okta-auth-js#configuration-reference) For the *RedirectURI*, please refer to the output value on the deployment template. 
+        Under the OktaAuth object, replace each of these property values with ones from your Okta org and application. For more information about these properties, see the [Client Configuration section of the Auth SDK reference](https://github.com/okta/okta-auth-js#configuration-reference) For the *RedirectURI*, please refer to the `CloudFrontURL` output value on the deployment template. 
         
         ```javascript
           const oktaAuth = new OktaAuth({
@@ -267,13 +267,13 @@ After you successfully deploy the solution using the steps in the previous secti
         
     * **src/config/index.ts**
       
-        Replace the BG_ENDPOINTS values for *ApiKey* and *Endpoint* with ones from your AWS deployment. Please refer to the `ApiGatewayKeyValue` and `ServiceEndpoint` output values on the deployment template. 
+        Replace the BG_ENDPOINTS values for *ApiKey* and *Endpoint* with ones from your AWS deployment. Please refer to the `ApiGatewayKeyValue`, `CloudFrontURL` and `APIStage` output values on the deployment template. 
         
         ```javascript
         export const BG_ENDPOINTS = {
             ApiKey: '<ApiKey>',
-            Endpoint: 'https://<ApiEndpoint>',
-            Resources : ['get_requests', 'get_pending_requests', 'get_processed_requests', 'get_all_requests', 'create_request', 'delete_request', 'approve_request', 'reject_request', 'update_request_url', 'federate_console', 'federate_cli']
+            Endpoint: 'https://<CloudFrontURL>/<APIStage>',
+            Resources : ['get_requests', 'get_pending_requests', 'get_processed_requests', 'get_all_requests', 'create_request', 'delete_request', 'approve_request', 'reject_request', 'federate_console', 'federate_cli']
         };
         ```
         
