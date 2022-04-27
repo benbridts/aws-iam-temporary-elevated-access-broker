@@ -215,14 +215,14 @@ Resources:
               CanonicalUser: !GetAtt 
                 - OriginAccessIdentity
                 - S3CanonicalUserId
-  CloudFrontCachePolicy:
+  APICloudFrontCachePolicy:
     Type: 'AWS::CloudFront::CachePolicy'
     Properties:
       CachePolicyConfig:
-        DefaultTTL: 86400
-        MaxTTL: 31536000
-        MinTTL: 1
-        Name: !Sub '${AWS::StackName}-cache-policy'
+        DefaultTTL: 0
+        MaxTTL: 1
+        MinTTL: 0
+        Name: !Sub '${AWS::StackName}-api-cache-policy'
         ParametersInCacheKeyAndForwardedToOrigin:
           EnableAcceptEncodingGzip: false
           HeadersConfig:
@@ -237,6 +237,27 @@ Resources:
             CookieBehavior: none
           QueryStringsConfig:
             QueryStringBehavior: all
+  S3CloudFrontCachePolicy:
+    Type: 'AWS::CloudFront::CachePolicy'
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 86400
+        MaxTTL: 31536000
+        MinTTL: 1
+        Name: !Sub '${AWS::StackName}-s3-cache-policy'
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: false
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - Access-Control-Request-Headers
+              - Access-Control-Request-Method
+              - Origin
+              - Authorization
+          CookiesConfig:
+            CookieBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
   Distribution:
     Type: 'AWS::CloudFront::Distribution'
     DependsOn: OriginAccessIdentity
@@ -246,7 +267,7 @@ Resources:
         HttpVersion: http2
         DefaultRootObject: index.html
         DefaultCacheBehavior:
-          CachePolicyId: !Ref CloudFrontCachePolicy
+          CachePolicyId: !Ref S3CloudFrontCachePolicy
           AllowedMethods:
             - GET
             - HEAD
@@ -264,7 +285,7 @@ Resources:
               LambdaFunctionARN: !Ref OriginResponseLambdaFunctionVersion
         CacheBehaviors:
         - TargetOriginId: APIGW
-          CachePolicyId: !Ref CloudFrontCachePolicy
+          CachePolicyId: !Ref APICloudFrontCachePolicy
           ViewerProtocolPolicy: redirect-to-https
           ResponseHeadersPolicyId: !Ref CloudFrontResourceHeadersPolicy
           AllowedMethods:
